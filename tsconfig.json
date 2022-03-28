@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "rootDir": "./backend",
+    "outDir": "./backend/build",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+  },
+  "include": [
+    "backend"
+  ],
+  "exclude": [
+    "backend/build",
+    "**/node_modules",
+    "**/.*/"
+  ]
+}
