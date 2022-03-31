@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import {
+  getVideosHandler,
   initiateUploadHandler,
   processUploadHandler,
   completeUploadHandler,
@@ -13,5 +14,7 @@ router.post('/upload', initiateUploadHandler);
 router.put('/upload/:uploadId', processUploadHandler);
 router.post('/upload/:uploadId', completeUploadHandler);
 router.delete('/upload/:uploadId', cancelUploadHandler);
+
+router.get('/', getVideosHandler);
 
 export default router;

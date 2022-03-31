@@ -5,29 +5,37 @@ import { v4 as uuidv4 } from 'uuid';
 export const useVideoUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [videoInfo, setVideoInfo] = useState<{
+    id: string;
+    title: string;
     fileName: string;
     fileSize: number;
     duration: number;
-    url: string;
   } | null>(null);
 
   const progressArray = useRef<number[]>([]);
 
-  const generateVideoInfo = useCallback(async (file: File) => {
-    const videoDuration = await new Promise<number>((resolve) => {
-      const video = document.createElement('video');
+  const generateVideoInfo = useCallback(
+    async (file: File, id: string, title: string) => {
+      const videoDuration = await new Promise<number>((resolve) => {
+        const video = document.createElement('video');
 
-      video.onloadedmetadata = () => resolve(video.duration);
-      video.src = URL.createObjectURL(file);
-    });
+        video.onloadedmetadata = () => resolve(video.duration);
+        video.src = URL.createObjectURL(file);
+      });
 
-    setVideoInfo({
-      fileName: file.name,
-      fileSize: file.size,
-      duration: videoDuration,
-      url: '',
-    });
-  }, []);
+      const videoInfo = {
+        id,
+        title,
+        fileName: file.name,
+        fileSize: file.size,
+        duration: videoDuration,
+      };
+
+      setVideoInfo(videoInfo);
+      return videoInfo;
+    },
+    []
+  );
 
   const uploadProgressHandler = useCallback((index: number, count: number) => {
     return (event: ProgressEvent) => {
@@ -43,18 +51,19 @@ export const useVideoUpload = () => {
   }, []);
 
   const uploadVideo = useCallback(
-    async (file: File) => {
+    async (file: File, title: string) => {
       /**
-       * Get Video Info
+       * Create Video Info
        */
 
-      await generateVideoInfo(file);
+      const videoId = uuidv4();
+      const videoInfo = await generateVideoInfo(file, videoId, title);
 
       /**
        * Initiate Multipart Upload
        */
 
-      const key = `${uuidv4()}.${file.type.split('/')[1]}`;
+      const key = `${videoId}.${file.type.split('/')[1]}`;
       const baseUrl = process.env.REACT_APP_SERVER_URL;
       const initiateResponse = await axios.post(`${baseUrl}/videos/upload`, {
         key,
@@ -110,18 +119,13 @@ export const useVideoUpload = () => {
        * Complete Multipart Upload
        */
 
-      const completeResponse = await axios.post(
-        `${baseUrl}/videos/upload/${uploadId}`,
-        {
-          key,
-          parts: uploadParts,
-        }
-      );
-
-      const { url } = completeResponse.data;
+      await axios.post(`${baseUrl}/videos/upload/${uploadId}`, {
+        key,
+        parts: uploadParts,
+        video: videoInfo,
+      });
 
       setUploadProgress(100);
-      setVideoInfo((state) => ({ ...state!, url }));
     },
     [generateVideoInfo, uploadProgressHandler]
   );

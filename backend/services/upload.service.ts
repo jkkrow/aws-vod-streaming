@@ -1,16 +1,8 @@
-import { S3 } from 'aws-sdk';
-
-const s3 = new S3({
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY!,
-    secretAccessKey: process.env.S3_SECRET_KEY!,
-  },
-  region: process.env.S3_BUCKET_REGION!,
-});
+import { s3 } from '../config/aws';
 
 export const initiateMutlipart = async (fileType: string, key: string) => {
   const params = {
-    Bucket: process.env.S3_BUCKET_NAME!,
+    Bucket: process.env.AWS_S3_BUCKET_NAME!,
     Key: `videos/${key}`,
     ContentType: fileType,
   };
@@ -24,7 +16,7 @@ export const processMultipart = async (
   key: string
 ) => {
   const params = {
-    Bucket: process.env.S3_BUCKET_NAME!,
+    Bucket: process.env.AWS_S3_BUCKET_NAME!,
     Key: `videos/${key}`,
     UploadId: uploadId,
   };
@@ -49,7 +41,7 @@ export const completeMultipart = async (
   key: string
 ) => {
   const params = {
-    Bucket: process.env.S3_BUCKET_NAME!,
+    Bucket: process.env.AWS_S3_BUCKET_NAME!,
     Key: `videos/${key}`,
     UploadId: uploadId,
     MultipartUpload: { Parts: parts },
@@ -60,7 +52,7 @@ export const completeMultipart = async (
 
 export const cancelMultipart = async (uploadId: string, key: string) => {
   const params = {
-    Bucket: process.env.S3_BUCKET_NAME!,
+    Bucket: process.env.AWS_S3_BUCKET_NAME!,
     Key: `videos/${key}`,
     UploadId: uploadId,
   };

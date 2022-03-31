@@ -1,0 +1,22 @@
+.input {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  margin: 0 auto 1rem auto;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.input:focus-within {
+  color: darkorange;
+}
+
+.input input {
+  height: 2rem;
+  border: 1px solid black;
+  outline: none;
+}
+
+.input input:focus {
+  border-width: 2px;
+}

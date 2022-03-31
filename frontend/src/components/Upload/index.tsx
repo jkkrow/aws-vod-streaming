@@ -1,17 +1,32 @@
-import { useVideoUpload } from 'hooks/upload';
 import { formatSize, formatTime } from 'util/format';
 import './index.css';
 
-const Upload: React.FC = () => {
-  const { videoInfo, uploadProgress, uploadVideo } = useVideoUpload();
+interface UploadProps {
+  videoInfo: {
+    id: string;
+    title: string;
+    fileName: string;
+    fileSize: number;
+    duration: number;
+  } | null;
+  uploadProgress: number;
+  disabled: boolean;
+  onUpload: (file: File) => void;
+}
 
+const Upload: React.FC<UploadProps> = ({
+  videoInfo,
+  uploadProgress,
+  disabled,
+  onUpload,
+}) => {
   const fileChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
-    uploadVideo(event.target.files[0]);
+    onUpload(event.target.files[0]);
   };
 
   return (
-    <div className="upload">
+    <div className={`upload${disabled ? ' disabled' : ''}`}>
       {!videoInfo && (
         <label>
           <input
@@ -25,6 +40,10 @@ const Upload: React.FC = () => {
       )}
       {videoInfo && (
         <div className="video-info">
+          <div>
+            <span>Title:</span>
+            <span>{videoInfo.title}</span>
+          </div>
           <div>
             <span>Filename:</span>
             <span>{videoInfo.fileName}</span>
@@ -44,6 +63,9 @@ const Upload: React.FC = () => {
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
+          {uploadProgress === 100 && (
+            <p className="upload-message">Video uploaded successfully!</p>
+          )}
         </div>
       )}
     </div>

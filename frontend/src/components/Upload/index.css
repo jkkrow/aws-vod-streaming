@@ -7,6 +7,17 @@
   border: 2px solid black;
 }
 
+.upload.disabled {
+  cursor: not-allowed;
+  color: gray;
+  background-color: rgb(226, 226, 226);
+  border-color: transparent;
+}
+
+.upload.disabled label {
+  pointer-events: none;
+}
+
 .upload label {
   display: flex;
   justify-content: center;
@@ -58,4 +69,11 @@
 
 .upload-progress__current {
   background-color: darkorange;
+}
+
+.upload-message {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  text-align: center;
 }
