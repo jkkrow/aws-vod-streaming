@@ -49,13 +49,3 @@ export const completeMultipart = async (
 
   return await s3.completeMultipartUpload(params).promise();
 };
-
-export const cancelMultipart = async (uploadId: string, key: string) => {
-  const params = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-    Key: `videos/${key}`,
-    UploadId: uploadId,
-  };
-
-  return await s3.abortMultipartUpload(params).promise();
-};

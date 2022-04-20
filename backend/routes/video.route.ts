@@ -2,10 +2,10 @@ import { Router } from 'express';
 
 import {
   getVideosHandler,
+  createVideoHandler,
   initiateUploadHandler,
   processUploadHandler,
   completeUploadHandler,
-  cancelUploadHandler,
 } from '../controllers/video.controller';
 
 const router = Router();
@@ -13,8 +13,8 @@ const router = Router();
 router.post('/upload', initiateUploadHandler);
 router.put('/upload/:uploadId', processUploadHandler);
 router.post('/upload/:uploadId', completeUploadHandler);
-router.delete('/upload/:uploadId', cancelUploadHandler);
 
 router.get('/', getVideosHandler);
+router.post('/', createVideoHandler);
 
 export default router;

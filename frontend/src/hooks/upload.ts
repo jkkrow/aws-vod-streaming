@@ -14,28 +14,25 @@ export const useVideoUpload = () => {
 
   const progressArray = useRef<number[]>([]);
 
-  const generateVideoInfo = useCallback(
-    async (file: File, id: string, title: string) => {
-      const videoDuration = await new Promise<number>((resolve) => {
-        const video = document.createElement('video');
+  const generateVideoInfo = useCallback(async (file: File, title: string) => {
+    const videoDuration = await new Promise<number>((resolve) => {
+      const video = document.createElement('video');
 
-        video.onloadedmetadata = () => resolve(video.duration);
-        video.src = URL.createObjectURL(file);
-      });
+      video.onloadedmetadata = () => resolve(video.duration);
+      video.src = URL.createObjectURL(file);
+    });
 
-      const videoInfo = {
-        id,
-        title,
-        fileName: file.name,
-        fileSize: file.size,
-        duration: videoDuration,
-      };
+    const videoInfo = {
+      id: uuidv4(),
+      title,
+      fileName: file.name,
+      fileSize: file.size,
+      duration: videoDuration,
+    };
 
-      setVideoInfo(videoInfo);
-      return videoInfo;
-    },
-    []
-  );
+    setVideoInfo(videoInfo);
+    return videoInfo;
+  }, []);
 
   const uploadProgressHandler = useCallback((index: number, count: number) => {
     return (event: ProgressEvent) => {
@@ -56,14 +53,13 @@ export const useVideoUpload = () => {
        * Create Video Info
        */
 
-      const videoId = uuidv4();
-      const videoInfo = await generateVideoInfo(file, videoId, title);
+      const videoInfo = await generateVideoInfo(file, title);
 
       /**
        * Initiate Multipart Upload
        */
 
-      const key = `${videoId}.${file.type.split('/')[1]}`;
+      const key = `${videoInfo.id}.${file.type.split('/')[1]}`;
       const baseUrl = process.env.REACT_APP_SERVER_URL;
       const initiateResponse = await axios.post(`${baseUrl}/videos/upload`, {
         key,
@@ -119,10 +115,18 @@ export const useVideoUpload = () => {
        * Complete Multipart Upload
        */
 
-      await axios.post(`${baseUrl}/videos/upload/${uploadId}`, {
-        key,
-        parts: uploadParts,
-        video: videoInfo,
+      const completeResponse = await axios.post(
+        `${baseUrl}/videos/upload/${uploadId}`,
+        {
+          key,
+          parts: uploadParts,
+        }
+      );
+
+      const { url } = completeResponse.data;
+
+      await axios.post(`${baseUrl}/videos`, {
+        video: { ...videoInfo, url },
       });
 
       setUploadProgress(100);
