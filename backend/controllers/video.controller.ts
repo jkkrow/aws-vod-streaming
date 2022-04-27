@@ -1,16 +1,24 @@
 import { RequestHandler } from 'express';
 
-import { getVideos, createVideo } from '../services/video.service';
+import { getVideo, getVideos, createVideo } from '../services/video.service';
 import {
   initiateMutlipart,
   processMultipart,
   completeMultipart,
 } from '../services/upload.service';
 
-export const getVideosHandler: RequestHandler = async (req, res) => {
-  const videos = await getVideos();
+export const getVideoHandler: RequestHandler = async (req, res) => {
+  const { id } = req.params;
 
-  res.json({ videos });
+  const result = await getVideo(id);
+
+  res.json({ video: result.Item });
+};
+
+export const getVideosHandler: RequestHandler = async (req, res) => {
+  const result = await getVideos();
+
+  res.json({ videos: result.Items });
 };
 
 export const createVideoHandler: RequestHandler = async (req, res) => {

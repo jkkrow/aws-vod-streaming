@@ -12,6 +12,15 @@ interface Video {
 
 const TABLE_NAME = process.env.AWS_DB_TABLE_NAME!;
 
+export const getVideo = async (id: string) => {
+  const params = {
+    TableName: TABLE_NAME,
+    Key: { id },
+  };
+
+  return await dynamoClient.get(params).promise();
+};
+
 export const getVideos = async () => {
   const params = {
     TableName: TABLE_NAME,
